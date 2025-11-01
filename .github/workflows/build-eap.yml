@@ -1,0 +1,36 @@
+name: Build ACAP .eap (emulated ARM64)
+
+on:
+  push:
+    paths:
+      - 'app/**'
+      - 'build-inside-sdk.sh'
+      - '.github/workflows/build-eap.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Pull ACAP SDK image (arm64)
+        run: docker pull axisecp/acap-native-sdk:12.4.0-aarch64-ubuntu24.04 || true
+
+      - name: Run ACAP SDK container (emulated arm64) and build .eap
+        run: |
+          docker run --platform linux/arm64 --rm -v ${{ github.workspace }}/app:/opt/app \
+            axisecp/acap-native-sdk:12.4.0-aarch64-ubuntu24.04 \
+            /bin/bash -c "/opt/app/../build-inside-sdk.sh"
+
+      - name: Upload built .eap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: acap-package
+          path: app/*.eap
