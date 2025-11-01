@@ -27,7 +27,7 @@ jobs:
         run: |
           docker run --platform linux/arm64 --rm -v ${{ github.workspace }}/app:/opt/app \
             axisecp/acap-native-sdk:12.4.0-aarch64-ubuntu24.04 \
-            /bin/bash -c "/opt/app/../build-inside-sdk.sh"
+            /bin/bash -c "/app/../build-inside-sdk.sh"
 
       - name: Upload built .eap artifact
         uses: actions/upload-artifact@v4
