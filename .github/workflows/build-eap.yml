@@ -6,7 +6,7 @@ on:
       - 'app/**'
       - 'build-inside-sdk.sh'
       - '.github/workflows/build-eap.yml'
-
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
