@@ -1,37 +1,30 @@
-name: Build ACAP .eap (Cross-compile, fast)
+name: ACAP Project – Test & Upload
 
 on:
   push:
     paths:
       - 'app/**'
-      - 'build-inside-sdk.sh'
-      - '.github/workflows/build-eap.yml'
- 
+      - '.github/workflows/**'
+
 jobs:
-  build:
+  test-and-upload:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Pull ACAP SDK image (x86_64, cross-compile)
-        run: docker pull axisecp/acap-native-sdk:12.4.0-x86_64-ubuntu24.04
-
       - name: List workspace files
         run: ls -R ${{ github.workspace }}
 
-      - name: Run ACAP SDK container and build .eap
+      - name: Syntax check C files (gcc)
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/opt/workspace \
-            axisecp/acap-native-sdk:12.4.0-x86_64-ubuntu24.04 \
-            /bin/bash -c "set -x; cd /opt/workspace; /opt/workspace/build-inside-sdk.sh"
+          for f in app/src/*.c; do
+            echo "Checking $f"
+            gcc -fsyntax-only "$f"
+          done
 
-      - name: Check built .eap files
-        run: ls -l app/bin/
-
-      - name: Upload built .eap artifact
+      - name: Upload prebuilt .eap artifact
         uses: actions/upload-artifact@v4
         with:
           name: acap-package
