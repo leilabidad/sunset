@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'app/**'
+      - 'build-inside-sdk.sh'
       - '.github/workflows/**'
 
 jobs:
@@ -17,14 +18,14 @@ jobs:
       - name: List workspace files
         run: ls -R ${{ github.workspace }}
 
-      - name: Syntax check C files (gcc)
+      - name: Syntax check C files
         run: |
           for f in app/src/*.c; do
             echo "Checking $f"
             gcc -fsyntax-only "$f"
           done
 
-      - name: Upload prebuilt .eap artifact
+      - name: Upload prebuilt .eap files
         uses: actions/upload-artifact@v4
         with:
           name: acap-package
