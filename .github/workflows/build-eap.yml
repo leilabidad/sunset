@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,16 +22,17 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Pull ACAP SDK image (arm64)
-        run: docker pull axisecp/acap-native-sdk:12.4.0-aarch64-ubuntu24.04 || true
+        run: docker pull axisecp/acap-native-sdk:12.4.0-aarch64-ubuntu24.04
 
       - name: Run ACAP SDK container (emulated arm64) and build .eap
         run: |
-          docker run --platform linux/arm64 --rm -v ${{ github.workspace }}/app:/opt/app \
+          docker run --platform linux/arm64 --rm \
+            -v ${{ github.workspace }}:/opt/workspace \
             axisecp/acap-native-sdk:12.4.0-aarch64-ubuntu24.04 \
-            /bin/bash -c "/app/../build-inside-sdk.sh"
+            /bin/bash -c "/opt/workspace/build-inside-sdk.sh"
 
       - name: Upload built .eap artifact
         uses: actions/upload-artifact@v4
         with:
           name: acap-package
-          path: app/*.eap
+          path: app/bin/*.eap
